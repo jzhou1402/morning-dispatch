@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Morning Dispatch — {{ date_short }}</title>
+  <title>{{ dispatch_title }} — {{ date_short }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
@@ -123,6 +123,85 @@
     .sleep-score-bar-fill { height: 100%; background: var(--ink); }
     .sleep-score-bar-label { display: flex; justify-content: space-between; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; color: var(--ink-light); }
     .sleep-note { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.8rem; color: var(--ink-light); margin-left: auto; }
+    .sleep-week {
+      background: var(--paper);
+      border-bottom: 2px solid var(--rule);
+      padding: 10px 24px 12px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 20px;
+      align-items: end;
+    }
+    .sleep-week-summary {
+      border-right: 1px solid rgba(26,18,8,0.22);
+      padding-right: 18px;
+    }
+    .sleep-week-kicker {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .sleep-week-average {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.9rem;
+      line-height: 1;
+    }
+    .sleep-week-meta {
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-top: 3px;
+    }
+    .sleep-week-chart {
+      min-height: 92px;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(34px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+    .sleep-week-day {
+      height: 92px;
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      gap: 4px;
+      text-align: center;
+    }
+    .sleep-week-bar-wrap {
+      height: 58px;
+      border-left: 1px solid rgba(26,18,8,0.16);
+      border-right: 1px solid rgba(26,18,8,0.16);
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      background: rgba(0,0,0,0.035);
+    }
+    .sleep-week-bar {
+      width: 70%;
+      min-height: 2px;
+      background: var(--ink);
+    }
+    .sleep-week-bar.missing {
+      height: 2px;
+      background: rgba(26,18,8,0.24);
+    }
+    .sleep-week-score {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.78rem;
+      line-height: 1;
+    }
+    .sleep-week-label {
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
 
     /* ── Section Rule ── */
     .section-rule { display: flex; align-items: center; padding: 0 24px; }
@@ -251,7 +330,7 @@
 
     .not-configured { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.8rem; color: var(--ink-light); line-height: 1.5; }
 
-    /* ── Culture Strip (HN / Reddit / Spotify / APOD) ── */
+    /* ── Culture Strip ── */
     .culture-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -260,10 +339,30 @@
       border-bottom: 2px solid var(--rule);
     }
     .culture-col { padding: 14px 16px 14px 0; border-right: 1px solid rgba(26,18,8,0.2); }
-    .culture-col:last-child { border-right: none; padding-right: 0; padding-left: 0; }
-    .culture-col:nth-child(2) { padding-left: 16px; }
-    .culture-col:nth-child(3) { padding-left: 16px; }
-    .culture-col:nth-child(4) { padding-left: 16px; }
+    .culture-col:last-child { border-right: none; padding-right: 0; }
+    .culture-col:nth-child(n+2) { padding-left: 16px; }
+
+    /* ── Curiosities Strip ── */
+    .curiosity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 2px solid var(--rule);
+    }
+    .curiosity-col { padding: 14px 16px 14px 0; border-right: 1px solid rgba(26,18,8,0.2); }
+    .curiosity-col:last-child { border-right: none; padding-right: 0; }
+    .curiosity-col:nth-child(n+2) { padding-left: 16px; }
+
+    /* ── APOD Full Width ── */
+    .apod-full { display: grid; grid-template-columns: 360px 1fr; gap: 0; padding: 0 24px; border-bottom: 2px solid var(--rule); }
+    .apod-full-img { padding: 16px 20px 16px 0; }
+    .apod-full-img img { width: 100%; object-fit: cover; cursor: pointer; }
+    .apod-full-body { padding: 16px 0 16px 20px; border-left: 1px solid rgba(26,18,8,0.2); }
+    .apod-full-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.5rem; line-height: 1.15; margin-bottom: 4px; cursor: pointer; }
+    .apod-full-title:hover { text-decoration: underline; }
+    .apod-full-date { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 10px; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+    .apod-full-text { font-size: 0.85rem; line-height: 1.75; text-align: justify; hyphens: auto; column-count: 2; column-gap: 24px; column-rule: 1px solid rgba(26,18,8,0.12); }
     .culture-headline { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.9rem; line-height: 1.2; margin-bottom: 8px; }
 
     .hn-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
@@ -395,6 +494,26 @@
     .pull-quote { border-top: 3px solid var(--rule); border-bottom: 3px solid var(--rule); padding: 10px 0; margin: 12px 0; }
     .pull-quote p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.95rem; line-height: 1.35; text-align: center; }
     .pull-quote cite { display: block; text-align: center; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-top: 5px; font-style: normal; }
+
+    @media (max-width: 760px) {
+      .sleep-week {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .sleep-week-summary {
+        border-right: none;
+        border-bottom: 1px solid rgba(26,18,8,0.22);
+        padding-right: 0;
+        padding-bottom: 10px;
+      }
+      .sleep-week-chart {
+        grid-template-columns: repeat(7, minmax(28px, 1fr));
+        gap: 6px;
+      }
+      .sleep-week-label {
+        font-size: 0.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -409,7 +528,7 @@
 
   <!-- Masthead -->
   <div class="masthead">
-    <div class="masthead-title">The Morning Dispatch</div>
+    <div class="masthead-title">{{ dispatch_title }}</div>
     <div class="masthead-tagline">Personal Edition &nbsp;·&nbsp; Curated nightly, delivered at dawn</div>
   </div>
 
@@ -458,6 +577,33 @@
     </div>
     <div class="sleep-note" id="statNote">{{ sleep.note if sleep.note }}</div>
   </div>
+
+  {% if is_sunday %}
+    <div class="sleep-week">
+      <div class="sleep-week-summary">
+        <div class="sleep-week-kicker">Week in Sleep</div>
+        <div class="sleep-week-average">
+          {% if sleep_week.average is not none %}{{ sleep_week.average }}{% else %}--{% endif %}
+        </div>
+        <div class="sleep-week-meta">{{ sleep_week.count }} of 7 days tracked</div>
+      </div>
+      <div class="sleep-week-chart">
+        {% for day in sleep_week.days %}
+          <div class="sleep-week-day" title="{{ day.date }}">
+            <div class="sleep-week-bar-wrap">
+              {% if day.has_score %}
+                <div class="sleep-week-bar" style="height: {{ day.quality }}%;"></div>
+              {% else %}
+                <div class="sleep-week-bar missing"></div>
+              {% endif %}
+            </div>
+            <div class="sleep-week-score">{% if day.has_score %}{{ day.quality }}{% else %}--{% endif %}</div>
+            <div class="sleep-week-label">{{ day.label }} {{ day.short }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
 
   <!-- ── Letters to the Editor + Almanac ────────────────── -->
   <div class="section-rule" style="padding-top:0;">
@@ -512,24 +658,6 @@
         </div>
       {% endif %}
 
-      <!-- Word of the Day -->
-      {% if word_of_day %}
-        <div class="almanac-block word-of-day">
-          <div class="almanac-block-title">Word of the Day</div>
-          <div class="word">{{ word_of_day.word }}</div>
-          <div class="pos">{{ word_of_day.part_of_speech }}</div>
-          <div class="def">{{ word_of_day.definition }}</div>
-          {% if word_of_day.example %}
-            <div class="ex">"{{ word_of_day.example }}"</div>
-          {% endif %}
-        </div>
-      {% else %}
-        <div class="almanac-block">
-          <div class="almanac-block-title">Word of the Day</div>
-          <p class="not-configured">Set WORDNIK_API_KEY in .env</p>
-        </div>
-      {% endif %}
-
       <!-- On This Day -->
       {% if on_this_day %}
         <div class="almanac-block">
@@ -542,22 +670,11 @@
         </div>
       {% endif %}
 
-      <!-- Trivia -->
-      {% if trivia %}
+      <!-- Cat Fact -->
+      {% if catfact %}
         <div class="almanac-block">
-          <div class="almanac-block-title">Daily Trivia</div>
-          <div class="trivia-list">
-            {% for q in trivia %}
-              <div>
-                <div class="trivia-cat">{{ q.category }} · {{ q.difficulty }}</div>
-                <div class="trivia-q">{{ q.question }}</div>
-                <div class="trivia-answer">
-                  <span class="hide">[reveal answer]</span>
-                  <span class="reveal">{{ q.correct_answer }}</span>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
+          <div class="almanac-block-title">Cat Fact of the Day</div>
+          <div style="font-family:'IM Fell English',serif;font-style:italic;font-size:0.82rem;line-height:1.5;">{{ catfact.fact }}</div>
         </div>
       {% endif %}
 
@@ -673,12 +790,11 @@
             <li>
               <div class="reddit-sub">r/{{ post.subreddit }}</div>
               <a href="{{ post.url }}" target="_blank">{{ post.title }}</a>
-              <div class="hn-meta">{{ post.score }} pts · {{ post.comments }} comments</div>
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <p class="not-configured">Add REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET to .env</p>
+        <p class="not-configured">Could not fetch Reddit posts.</p>
       {% endif %}
     </div>
 
@@ -700,25 +816,102 @@
       {% endif %}
     </div>
 
-    <!-- NASA APOD -->
+    <!-- Spaceflight News -->
     <div class="culture-col">
-      <div class="kicker">Science</div>
-      <div class="culture-headline">NASA: Astronomy Picture</div>
-      {% if apod %}
-        <div class="apod-card" onclick="openGallery()" style="cursor:pointer">
-          {% if apod.media_type == "image" %}
-            <img class="apod-img" src="{{ apod.url }}" alt="{{ apod.title }}" />
-          {% endif %}
-          <div class="apod-title">{{ apod.title }}</div>
-          <div class="apod-body">{{ apod.explanation }}</div>
-          <div class="apod-read-more">Read full caption →</div>
+      <div class="kicker">Space</div>
+      <div class="culture-headline">Spaceflight News</div>
+      {% if spaceflight %}
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          {% for article in spaceflight %}
+            <div style="padding-bottom:10px;border-bottom:1px solid rgba(26,18,8,0.12);">
+              <div style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);margin-bottom:2px;">{{ article.source }}</div>
+              <a href="{{ article.url }}" target="_blank" style="font-family:'Playfair Display',serif;font-weight:700;font-size:0.82rem;line-height:1.25;color:var(--ink);text-decoration:none;">{{ article.title }}</a>
+            </div>
+          {% endfor %}
         </div>
       {% else %}
-        <p class="not-configured">Set NASA_API_KEY in .env</p>
+        <p class="not-configured">Could not fetch spaceflight news.</p>
       {% endif %}
     </div>
 
   </div><!-- /culture-grid -->
+
+  <!-- ── Curiosities ─────────────────────────────────────── -->
+  <div class="section-rule">
+    <div class="section-rule-label">Curiosities</div>
+    <div class="section-rule-line"></div>
+  </div>
+
+  <div class="curiosity-grid">
+
+    <!-- Trivia -->
+    <div class="curiosity-col">
+      <div class="kicker">Brain Teasers</div>
+      <div class="culture-headline">Daily Trivia</div>
+      {% if trivia %}
+        <div class="trivia-list">
+          {% for q in trivia %}
+            <div>
+              <div class="trivia-cat">{{ q.category }} · {{ q.difficulty }}</div>
+              <div class="trivia-q">{{ q.question }}</div>
+              <div class="trivia-answer">
+                <span class="hide">[reveal answer]</span>
+                <span class="reveal">{{ q.correct_answer }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Rick & Morty -->
+    <div class="curiosity-col">
+      <div class="kicker">Rick &amp; Morty</div>
+      <div class="culture-headline">Character of the Day</div>
+      {% if rickandmorty %}
+        {% if rickandmorty.image %}
+          <img src="{{ rickandmorty.image }}" alt="{{ rickandmorty.name }}" style="width:100%;height:auto;display:block;margin-bottom:8px;" />
+        {% endif %}
+        <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;">{{ rickandmorty.name }}</div>
+        <div style="font-size:0.72rem;color:var(--ink-light);margin-top:3px;">{{ rickandmorty.species }} · {{ rickandmorty.gender }} · <span style="color:{% if rickandmorty.status == 'Alive' %}#1a5c1a{% elif rickandmorty.status == 'Dead' %}var(--accent){% else %}var(--ink-light){% endif %}">{{ rickandmorty.status }}</span></div>
+        <div style="font-size:0.72rem;color:var(--ink-light);margin-top:2px;">From: {{ rickandmorty.origin }}</div>
+        <div style="font-size:0.72rem;color:var(--ink-light);">Last seen: {{ rickandmorty.location }}</div>
+      {% endif %}
+    </div>
+
+    <!-- ISS -->
+    <div class="curiosity-col">
+      <div class="kicker">Space</div>
+      <div class="culture-headline">International Space Station</div>
+      {% if iss %}
+        <div style="font-family:'Playfair Display',serif;font-weight:900;font-size:2rem;line-height:1;">{{ iss.crew_count }}</div>
+        <div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px;">Crew Members Aboard</div>
+        <div style="font-size:0.78rem;line-height:1.6;color:var(--ink);">{{ iss.crew | join(' · ') }}</div>
+        <div style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-top:8px;border-top:1px solid rgba(26,18,8,0.15);padding-top:6px;">{{ iss.lat }}° lat · {{ iss.lon }}° lon</div>
+      {% endif %}
+    </div>
+
+  </div><!-- /curiosity-grid -->
+
+  <!-- ── NASA Astronomy Picture ─────────────────────────── -->
+  {% if apod %}
+    <div class="section-rule">
+      <div class="section-rule-label">Astronomy Picture of the Day</div>
+      <div class="section-rule-line"></div>
+    </div>
+    <div class="apod-full">
+      <div class="apod-full-img">
+        {% if apod.media_type == "image" %}
+          <img src="{{ apod.url }}" alt="{{ apod.title }}" onclick="openGallery()" />
+        {% endif %}
+      </div>
+      <div class="apod-full-body">
+        <div class="apod-full-title" onclick="openGallery()">{{ apod.title }}</div>
+        <div class="apod-full-date">NASA · {{ apod.date }}</div>
+        <div class="apod-full-text">{{ apod.explanation }}</div>
+      </div>
+    </div>
+  {% endif %}
 
   <!-- ── Op-Ed ──────────────────────────────────────────── -->
   {% if oped %}
@@ -740,7 +933,7 @@
 
   <!-- Footer -->
   <div class="footer">
-    <span>The Morning Dispatch &nbsp;·&nbsp; Personal Edition</span>
+    <span>{{ dispatch_title }} &nbsp;·&nbsp; Personal Edition</span>
     <span>Generated {{ date_short }} at {{ generated_at }}</span>
     <span>Page 1 of 1</span>
   </div>

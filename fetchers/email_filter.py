@@ -1,22 +1,50 @@
 import os
 import json
 
-SYSTEM_PROMPT = """You are a personal assistant filtering a morning email digest.
-Given a list of emails, return only the ones that are genuinely worth reading —
-things like: messages from real people, important updates, interesting news,
-financial alerts, or anything requiring action.
+SYSTEM_PROMPT = """You are a personal assistant filtering a morning email digest for one reader.
+Return only emails that are genuinely worth reading. Be ruthless about cutting noise.
 
-Exclude: marketing emails, newsletters, automated notifications, promotional offers,
-subscription digests, social media alerts, or anything that feels like noise.
+KEEP:
+- Messages from real, specific people (friends, family, colleagues, recruiters)
+- Time-sensitive action items (bills due, packages, appointments, deadlines)
+- Financial transactions or account changes the user initiated
+- Replies to conversations the user is part of
 
-Return a JSON array of the email indices (0-based) you want to keep, ranked by importance.
+CUT everything else, including but not limited to:
+- Automated security alerts (unusual sign-in, password reset, verification codes)
+- Marketing, promotions, deals, or newsletters of any kind
+- Social media notifications or digests
+- Shipping/order confirmations unless highly time-sensitive
+- Repeated emails with the same or near-identical subject from the same sender
+- Anything from a no-reply address with no clear personal relevance
+
+Return a JSON array of up to 5 indices (0-based) to KEEP, ranked by importance (most important first).
 Example: [2, 0, 4]
+If nothing is worth keeping, return: []
 Return ONLY the JSON array, nothing else."""
+
+
+def _deduplicate(emails: list) -> list:
+    """Drop near-duplicate emails — same sender + same subject stem."""
+    seen = set()
+    unique = []
+    for e in emails:
+        # normalise: lowercase, strip Re:/Fwd:, truncate to first 60 chars
+        subject_stem = e["subject"].lower().replace("re:", "").replace("fwd:", "").strip()[:60]
+        sender = e["from"].lower()
+        key = (sender, subject_stem)
+        if key not in seen:
+            seen.add(key)
+            unique.append(e)
+    return unique
+
 
 def filter_emails(emails: list) -> list:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key or not emails:
         return emails
+
+    emails = _deduplicate(emails)
 
     from openai import OpenAI
     client = OpenAI(api_key=api_key)

@@ -4,6 +4,7 @@ Morning Dispatch generator.
 Usage:  python3 generate.py            # prompts for sleep if not cached
         python3 generate.py --no-open  # skip browser open
         python3 generate.py --no-cache # force re-fetch all data
+        python3 generate.py --no-email # skip Gmail delivery
 """
 import sys
 import os
@@ -23,6 +24,7 @@ load_dotenv()
 
 ROOT        = Path(__file__).parent
 SLEEP_CACHE = ROOT / "sleep_cache.json"
+SLEEP_HISTORY = ROOT / "sleep_history.json"
 FETCH_CACHE = ROOT / "fetch_cache.json"
 REPORT      = ROOT / "report.html"
 
@@ -78,6 +80,61 @@ def load_sleep_cache():
 
 def save_sleep_cache(sleep: dict):
     SLEEP_CACHE.write_text(json.dumps({"date": date.today().isoformat(), "sleep": sleep}))
+    save_sleep_history(date.today(), sleep)
+
+def load_sleep_history() -> dict:
+    history = {}
+    if not SLEEP_HISTORY.exists():
+        data = {}
+    else:
+        try:
+            data = json.loads(SLEEP_HISTORY.read_text())
+        except Exception:
+            data = {}
+    if isinstance(data, dict):
+        history.update(data)
+
+    try:
+        cached = json.loads(SLEEP_CACHE.read_text())
+        cached_date = cached.get("date")
+        if cached_date and cached.get("sleep") and cached_date not in history:
+            history[cached_date] = cached["sleep"]
+    except Exception:
+        pass
+
+    return history
+
+def save_sleep_history(day: date, sleep: dict):
+    history = load_sleep_history()
+    history[day.isoformat()] = sleep
+    SLEEP_HISTORY.write_text(json.dumps(history, indent=2))
+
+def weekly_sleep_scores(today: date) -> dict:
+    history = load_sleep_history()
+    days = []
+    scores = []
+
+    for offset in range(6, -1, -1):
+        day = today - timedelta(days=offset)
+        entry = history.get(day.isoformat())
+        quality = None
+        if entry:
+            try:
+                quality = max(0, min(100, int(entry.get("quality", 0))))
+            except (TypeError, ValueError):
+                quality = None
+        if quality is not None:
+            scores.append(quality)
+        days.append({
+            "date": day.isoformat(),
+            "label": day.strftime("%a"),
+            "short": day.strftime("%-m/%-d"),
+            "quality": quality,
+            "has_score": quality is not None,
+        })
+
+    avg = round(sum(scores) / len(scores)) if scores else None
+    return {"days": days, "average": avg, "count": len(scores)}
 
 # ── fetch cache ────────────────────────────────────────────────────
 
@@ -195,12 +252,30 @@ def build_context(sleep: dict) -> dict:
     save_fetch_cache(ctx)
     return ctx
 
+def add_dispatch_metadata(ctx: dict) -> dict:
+    today = date.today()
+    is_sunday = today.weekday() == 6
+    ctx.update({
+        "is_sunday": is_sunday,
+        "dispatch_title": "The Sunday Dispatch" if is_sunday else "The Morning Dispatch",
+        "sleep_week": weekly_sleep_scores(today),
+    })
+    return ctx
+
 # ── render ─────────────────────────────────────────────────────────
 
 def render(ctx: dict) -> str:
     env  = Environment(loader=FileSystemLoader(str(ROOT)), autoescape=True)
     tmpl = env.get_template("template.jinja2")
     return tmpl.render(**ctx)
+
+# ── email delivery ─────────────────────────────────────────────────
+
+def deliver_email(ctx: dict, to_email: str = None):
+    from fetchers.gmail_send import send_dispatch
+
+    subject = f"{ctx['dispatch_title']} - {ctx['date_short']}"
+    return send_dispatch(REPORT, subject, to_email=to_email)
 
 # ── sleep form server ──────────────────────────────────────────────
 
@@ -241,7 +316,7 @@ class _SleepHandler(BaseHTTPRequestHandler):
             fetch_ctx = load_fetch_cache()
             if fetch_ctx:
                 fetch_ctx["sleep"] = sleep
-                REPORT.write_text(render(fetch_ctx), encoding="utf-8")
+                REPORT.write_text(render(add_dispatch_metadata(fetch_ctx)), encoding="utf-8")
 
             self.send_response(200)
             self._cors_headers()
@@ -283,6 +358,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-open",  action="store_true")
     parser.add_argument("--no-cache", action="store_true", help="Force re-fetch all data")
+    parser.add_argument("--no-email", action="store_true", help="Skip Gmail delivery")
+    parser.add_argument("--email-to", help="Override DISPATCH_EMAIL_TO for this run")
     args = parser.parse_args()
 
     if args.no_cache:
@@ -291,9 +368,16 @@ def main():
 
     sleep = collect_sleep()
     ctx   = build_context(sleep)
+    ctx   = add_dispatch_metadata(ctx)
     html  = render(ctx)
     REPORT.write_text(html, encoding="utf-8")
     print(f"\nWrote {REPORT}")
+
+    if not args.no_email:
+        try:
+            deliver_email(ctx, to_email=args.email_to)
+        except Exception as e:
+            print(f"  ✗ Email delivery failed: {e}")
 
     start_sleep_server()
 

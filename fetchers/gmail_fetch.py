@@ -44,7 +44,7 @@ def _fetch_one(token_file, max_results, query):
         })
     return emails
 
-def fetch(max_results=12, query="category:primary newer_than:2d"):
+def fetch(max_results=40, query="category:primary newer_than:1d"):
     if not os.path.exists(CREDS_FILE):
         return None
 

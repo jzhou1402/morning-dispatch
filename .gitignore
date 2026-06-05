@@ -2,11 +2,13 @@
 google_credentials.json
 token_gmail.json
 token_gmail_2.json
+token_gmail_send.json
 token_calendar.json
 .spotify_token_cache
 report.html
 fetch_cache.json
 sleep_cache.json
+sleep_history.json
 __pycache__/
 *.pyc
 .DS_Store
