@@ -134,6 +134,11 @@ def build_context(sleep: dict) -> dict:
     from fetchers.webull_portfolio import fetch as webull_fetch
     from fetchers.opedgen          import fetch as oped_fetch
     from fetchers.email_filter     import filter_emails
+    from fetchers.catfact          import fetch as catfact_fetch
+    from fetchers.rickandmorty     import fetch as rm_fetch
+    from fetchers.iss              import fetch as iss_fetch
+    from fetchers.spaceflight      import fetch as sf_fetch
+    from fetchers.plants           import fetch as plants_fetch
 
     hackernews  = _safe_fetch("Hacker News",  hn_fetch,     count=5)
     trivia      = _safe_fetch("Trivia",        trivia_fetch, count=3)
@@ -147,6 +152,11 @@ def build_context(sleep: dict) -> dict:
     reddit      = _safe_fetch("Reddit",        reddit_fetch)
     spotify     = _safe_fetch("Spotify",       spotify_fetch)
     portfolio   = _safe_fetch("Markets",       webull_fetch)
+    catfact     = _safe_fetch("Cat Fact",      catfact_fetch)
+    rickandmorty = _safe_fetch("Rick & Morty", rm_fetch)
+    iss          = _safe_fetch("ISS",          iss_fetch)
+    spaceflight  = _safe_fetch("Spaceflight",  sf_fetch)
+    plants       = _safe_fetch("Plants",       plants_fetch)
 
     today     = date.today()
     issue_num = (today - date(2026, 1, 1)).days + 1
@@ -176,7 +186,11 @@ def build_context(sleep: dict) -> dict:
         "spotify":      spotify,
         "portfolio":    portfolio,
         "oped":         oped,
-        "plants":       None,
+        "plants":       plants,
+        "catfact":      catfact,
+        "rickandmorty": rickandmorty,
+        "iss":          iss,
+        "spaceflight":  spaceflight,
     }
     save_fetch_cache(ctx)
     return ctx
