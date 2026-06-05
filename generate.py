@@ -248,6 +248,17 @@ class _SleepHandler(BaseHTTPRequestHandler):
         pass
 
 def start_sleep_server():
+    import socket, signal
+    # free the port if a previous run left it open
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        if s.connect_ex(("localhost", 5050)) == 0:
+            import subprocess
+            result = subprocess.run(["lsof", "-ti", ":5050"], capture_output=True, text=True)
+            for pid in result.stdout.strip().splitlines():
+                try:
+                    os.kill(int(pid), signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
     server = HTTPServer(("localhost", 5050), _SleepHandler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server
