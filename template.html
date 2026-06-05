@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Morning Dispatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #1a1208;
+      --ink-light:  #3d3020;
+      --rule:       #1a1208;
+      --paper:      #f5f0e8;
+      --paper-dark: #ece5d4;
+      --accent:     #7a1a1a;
+      --col-gap:    24px;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      background: #c8bfa8;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      color: var(--ink);
+      padding: 32px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page Shell ───────────────────────────────────── */
+    .page {
+      background: var(--paper);
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 0 48px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.35), inset 0 0 80px rgba(0,0,0,0.03);
+      position: relative;
+    }
+
+    /* subtle paper texture via repeating gradient */
+    .page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 24px,
+        rgba(0,0,0,0.018) 24px,
+        rgba(0,0,0,0.018) 25px
+      );
+      pointer-events: none;
+    }
+
+    /* ── Dateline Banner ──────────────────────────────── */
+    .dateline {
+      border-bottom: 1px solid var(--rule);
+      border-top: 4px solid var(--rule);
+      padding: 4px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .dateline-left  { text-align: left; }
+    .dateline-right { text-align: right; }
+    .dateline-center { text-align: center; font-style: italic; letter-spacing: 0; text-transform: none; font-size: 0.7rem; }
+
+    /* ── Masthead ─────────────────────────────────────── */
+    .masthead {
+      text-align: center;
+      padding: 16px 24px 8px;
+      border-bottom: 3px double var(--rule);
+    }
+
+    .masthead-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+    }
+
+    .masthead-tagline {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--ink-light);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Edition Bar ──────────────────────────────────── */
+    .edition-bar {
+      border-bottom: 2px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      font-family: 'Libre Baskerville', serif;
+    }
+    .edition-bar span {
+      padding: 3px 16px;
+      border-right: 1px solid var(--rule);
+    }
+    .edition-bar span:last-child { border-right: none; }
+    .edition-bar .price { margin-left: auto; border-left: 1px solid var(--rule); border-right: none; }
+
+    /* ── Sleep Banner ─────────────────────────────────── */
+    .sleep-banner {
+      background: var(--paper-dark);
+      border-bottom: 2px solid var(--rule);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .sleep-banner-label {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .sleep-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+    .sleep-stat-value {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 1.15rem;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .sleep-stat-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
+
+    .sleep-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--rule);
+      opacity: 0.3;
+    }
+
+    .sleep-score-bar {
+      flex: 1;
+      min-width: 120px;
+      max-width: 220px;
+    }
+    .sleep-score-bar-track {
+      height: 6px;
+      background: rgba(0,0,0,0.12);
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .sleep-score-bar-fill {
+      height: 100%;
+      background: var(--ink);
+      /* width set inline per score */
+    }
+    .sleep-score-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 3px;
+      color: var(--ink-light);
+    }
+
+    .sleep-note {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--ink-light);
+      margin-left: auto;
+    }
+
+    /* ── Section Label ────────────────────────────────── */
+    .section-rule {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 24px;
+      margin: 0;
+    }
+    .section-rule-label {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--paper);
+      padding: 4px 10px;
+      position: relative;
+      z-index: 1;
+      color: var(--accent);
+      border: 1px solid var(--rule);
+      border-top: none;
+    }
+    .section-rule-line {
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ── Main Grid ────────────────────────────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr 1px 1fr 1px 1fr;
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 2px solid var(--rule);
+    }
+
+    .col-divider {
+      background: var(--rule);
+      opacity: 0.25;
+      margin: 16px 0;
+    }
+
+    /* ── Feature Story (spans 2 cols) ────────────────── */
+    .story-feature {
+      grid-column: 1 / 4; /* cols 1 + divider + 2 */
+      padding: 16px var(--col-gap) 16px 0;
+      border-right: 1px solid rgba(26,18,8,0.2);
+    }
+
+    .story-feature .kicker {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .story-feature .headline {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .story-feature .deck {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.4;
+      color: var(--ink-light);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 6px 0;
+      margin-bottom: 10px;
+    }
+
+    .story-feature .byline {
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 10px;
+    }
+
+    .story-feature .body {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      column-count: 2;
+      column-gap: var(--col-gap);
+      column-rule: 1px solid rgba(26,18,8,0.15);
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .story-feature .body p + p { margin-top: 0.75em; }
+
+    /* drop cap */
+    .story-feature .body p:first-child::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 3.6em;
+      line-height: 0.78;
+      float: left;
+      margin-right: 4px;
+      margin-top: 6px;
+      color: var(--ink);
+    }
+
+    /* ── Side Column ─────────────────────────────────── */
+    .story-sidebar {
+      grid-column: 5 / 8; /* cols 3 + divider + 4 */
+      padding: 16px 0 16px var(--col-gap);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Secondary Story ──────────────────────────────── */
+    .story-secondary {
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(26,18,8,0.2);
+    }
+    .story-secondary:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .story-secondary .kicker {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+
+    .story-secondary .headline {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+
+    .story-secondary .byline {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 5px;
+    }
+
+    .story-secondary .body {
+      font-size: 0.8rem;
+      line-height: 1.6;
+      text-align: justify;
+      hyphens: auto;
+      color: var(--ink);
+    }
+
+    /* ── Pull Quote ───────────────────────────────────── */
+    .pull-quote {
+      border-top: 3px solid var(--rule);
+      border-bottom: 3px solid var(--rule);
+      padding: 10px 0;
+      margin: 14px 0;
+    }
+    .pull-quote p {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      line-height: 1.35;
+      text-align: center;
+      color: var(--ink);
+    }
+    .pull-quote cite {
+      display: block;
+      text-align: center;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-top: 6px;
+      font-style: normal;
+    }
+
+    /* ── Bottom Grid ──────────────────────────────────── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      padding: 0 24px;
+    }
+    .bottom-story {
+      padding: 14px 20px 14px 0;
+      border-right: 1px solid rgba(26,18,8,0.2);
+    }
+    .bottom-story:last-child { border-right: none; padding-right: 0; padding-left: 20px; }
+    .bottom-story:nth-child(2) { padding-left: 20px; }
+
+    .bottom-story .kicker {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+    .bottom-story .headline {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+    .bottom-story .body {
+      font-size: 0.78rem;
+      line-height: 1.6;
+      text-align: justify;
+      hyphens: auto;
+      color: var(--ink);
+    }
+    .bottom-story .byline {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 4px;
+    }
+
+    /* ── Footer ───────────────────────────────────────── */
+    .footer {
+      border-top: 3px double var(--rule);
+      margin: 0 24px 0;
+      padding: 6px 0 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Dateline ───────────────────────────────────── -->
+  <div class="dateline">
+    <span class="dateline-left">Vol. I &nbsp;·&nbsp; No. 154</span>
+    <span class="dateline-center">"All the news fit to print — for one reader only"</span>
+    <span class="dateline-right">Tuesday, June 3, 2026</span>
+  </div>
+
+  <!-- ── Masthead ───────────────────────────────────── -->
+  <div class="masthead">
+    <div class="masthead-title">The Morning Dispatch</div>
+    <div class="masthead-tagline">Personal Edition &nbsp;·&nbsp; Curated nightly, delivered at dawn</div>
+  </div>
+
+  <!-- ── Edition Bar ────────────────────────────────── -->
+  <div class="edition-bar">
+    <span>San Francisco, CA</span>
+    <span>Sunrise 5:47 AM</span>
+    <span>Partly Cloudy · 58°F</span>
+    <span>Sleep Score: 84 / 100</span>
+    <span class="price">Free · Personal Use</span>
+  </div>
+
+  <!-- ── Sleep Banner ───────────────────────────────── -->
+  <div class="sleep-banner">
+    <div class="sleep-banner-label">Last Night's Rest</div>
+
+    <div class="sleep-divider"></div>
+
+    <div class="sleep-stat">
+      <span class="sleep-stat-value">11:32 PM</span>
+      <span class="sleep-stat-label">Bedtime</span>
+    </div>
+
+    <div class="sleep-divider"></div>
+
+    <div class="sleep-stat">
+      <span class="sleep-stat-value">7:18 AM</span>
+      <span class="sleep-stat-label">Wake time</span>
+    </div>
+
+    <div class="sleep-divider"></div>
+
+    <div class="sleep-stat">
+      <span class="sleep-stat-value">7h 46m</span>
+      <span class="sleep-stat-label">Duration</span>
+    </div>
+
+    <div class="sleep-divider"></div>
+
+    <div class="sleep-score-bar">
+      <div class="sleep-score-bar-track">
+        <div class="sleep-score-bar-fill" style="width: 84%;"></div>
+      </div>
+      <div class="sleep-score-bar-label">
+        <span>Sleep Quality</span>
+        <span>84 / 100</span>
+      </div>
+    </div>
+
+    <div class="sleep-note">Good night's sleep. Well rested.</div>
+  </div>
+
+  <!-- ── Section Label ──────────────────────────────── -->
+  <div class="section-rule" style="margin-top: 0; padding-top: 0;">
+    <div class="section-rule-label">Inbox Digest</div>
+    <div class="section-rule-line"></div>
+  </div>
+
+  <!-- ── Main Grid ──────────────────────────────────── -->
+  <div class="main-grid">
+
+    <!-- Feature Story (left 2 cols) -->
+    <div class="story-feature">
+      <div class="kicker">Top Story · Product</div>
+      <div class="headline">Anthropic Announces Claude 5 With Extended Reasoning, Sets New Benchmark in AI Capability</div>
+      <div class="deck">The new model family introduces persistent memory across sessions and a 2M token context window, pushing the frontier further than analysts expected.</div>
+      <div class="byline">From: Anthropic News &lt;news@anthropic.com&gt; &nbsp;·&nbsp; Received 11:04 PM</div>
+      <div class="body">
+        <p>Anthropic released Claude 5 late Monday evening, a model the company claims outperforms every prior benchmark across reasoning, coding, and multimodal tasks. The announcement, made via email to developers enrolled in the early-access program, outlined a new architecture built around extended chain-of-thought processing.</p>
+        <p>Perhaps most notably, the new model ships with native persistent memory, allowing it to retain context across conversations without requiring users to re-supply background information. Early testers described the capability as transformative for long-running engineering projects.</p>
+        <p>The 2-million-token context window — twice the prior maximum — means developers can now pass entire codebases, research corpora, or legal documents in a single prompt without chunking or retrieval pipelines. Pricing for the new tier has not yet been disclosed.</p>
+        <p>Industry reaction was swift. Within hours of the announcement, three major cloud providers had published integration guides. Analysts at Sequoia Capital called it "the most significant model release since GPT-4." Anthropic CEO Dario Amodei noted in an accompanying blog post that safety evaluations for Claude 5 took twice as long as any prior release.</p>
+      </div>
+    </div>
+
+    <div class="col-divider"></div>
+
+    <!-- Sidebar (right 2 cols) -->
+    <div class="story-sidebar">
+
+      <div class="story-secondary">
+        <div class="kicker">Finance · Markets</div>
+        <div class="headline">Your Robinhood Portfolio Is Up 3.2% This Week</div>
+        <div class="byline">From: Robinhood &lt;no-reply@robinhood.com&gt; &nbsp;·&nbsp; Received 6:00 AM</div>
+        <div class="body">Tech stocks led gains across your holdings with NVDA up 4.1%. Your weekly summary shows $312 in unrealized gains. Dividend payment of $14.22 credited to your account from VTI on June 1st.</div>
+      </div>
+
+      <div class="pull-quote">
+        <p>"You have 3 unread messages requiring action before noon."</p>
+        <cite>Inbox Summary</cite>
+      </div>
+
+      <div class="story-secondary">
+        <div class="kicker">Events · Calendar</div>
+        <div class="headline">Team Standup at 10 AM — Agenda Added by Sarah</div>
+        <div class="byline">From: Google Calendar &lt;calendar-notification@google.com&gt; &nbsp;·&nbsp; Received 8:01 AM</div>
+        <div class="body">Sarah Chen added an agenda to this morning's standup: Q3 roadmap prioritization and a demo of the new auth flow. Zoom link unchanged. Three attendees have accepted; two are tentative.</div>
+      </div>
+
+      <div class="story-secondary">
+        <div class="kicker">Correspondence</div>
+        <div class="headline">Mom Asks If You're Coming Home for the Fourth</div>
+        <div class="byline">From: Mom &lt;mzhou1964@gmail.com&gt; &nbsp;·&nbsp; Received 9:47 PM</div>
+        <div class="body">A warm email asking about July 4th plans and whether you've been eating well. She also mentioned the garden is doing well this year and attached a photo of the tomatoes.</div>
+      </div>
+
+    </div>
+
+  </div><!-- /main-grid -->
+
+  <!-- ── Section Label ──────────────────────────────── -->
+  <div class="section-rule" style="margin-top:0;">
+    <div class="section-rule-label">More From Your Inbox</div>
+    <div class="section-rule-line"></div>
+  </div>
+
+  <!-- ── Bottom Grid ────────────────────────────────── -->
+  <div class="bottom-grid">
+
+    <div class="bottom-story">
+      <div class="kicker">Newsletters · Tech</div>
+      <div class="headline">The Pragmatic Engineer: Why Platform Teams Keep Failing</div>
+      <div class="byline">From: Gergely Orosz &nbsp;·&nbsp; Received 7:00 AM</div>
+      <div class="body">This week's issue digs into the org dynamics that cause platform engineering teams to lose credibility with product engineers. The core thesis: platform teams optimize for capabilities nobody asked for while neglecting developer experience basics.</div>
+    </div>
+
+    <div class="bottom-story">
+      <div class="kicker">Finance · Banking</div>
+      <div class="headline">Chase Statement Ready: May Spending Up 12% vs. April</div>
+      <div class="byline">From: Chase &lt;no.reply.alerts@chase.com&gt; &nbsp;·&nbsp; Received 3:00 AM</div>
+      <div class="body">Your May statement is available. Total spend: $3,847. Largest categories: dining ($621), travel ($580), and subscriptions ($214). Your credit utilization sits at 18%, well within the recommended range.</div>
+    </div>
+
+    <div class="bottom-story">
+      <div class="kicker">Health &amp; Wellness</div>
+      <div class="headline">Whoop Recovery Score: 76% — Green. Ready for High-Intensity Training</div>
+      <div class="byline">From: WHOOP &lt;noreply@whoop.com&gt; &nbsp;·&nbsp; Received 7:15 AM</div>
+      <div class="body">HRV of 58ms (your 30-day average: 54ms). Resting heart rate 52 bpm. Respiratory rate 14.2 breaths/min. Strain coach recommends a hard training day. Your sleep debt stands at 14 minutes — essentially cleared.</div>
+    </div>
+
+  </div><!-- /bottom-grid -->
+
+  <!-- ── Footer ─────────────────────────────────────── -->
+  <div class="footer">
+    <span>The Morning Dispatch &nbsp;·&nbsp; Personal Edition</span>
+    <span>Generated June 3, 2026 at 7:30 AM</span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

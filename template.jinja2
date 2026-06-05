@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Morning Dispatch — {{ date_short }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #1a1208;
+      --ink-light:  #3d3020;
+      --rule:       #1a1208;
+      --paper:      #f5f0e8;
+      --paper-dark: #ece5d4;
+      --accent:     #7a1a1a;
+      --col-gap:    20px;
+    }
+
+    html { font-size: 16px; }
+    body {
+      background: #c8bfa8;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      color: var(--ink);
+      padding: 32px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      background: var(--paper);
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 0 48px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.35), inset 0 0 80px rgba(0,0,0,0.03);
+      position: relative;
+    }
+    .page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(0,0,0,0.018) 24px, rgba(0,0,0,0.018) 25px);
+      pointer-events: none;
+    }
+
+    /* ── Dateline ── */
+    .dateline {
+      border-bottom: 1px solid var(--rule);
+      border-top: 4px solid var(--rule);
+      padding: 4px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .dateline-center { text-align: center; font-style: italic; letter-spacing: 0; text-transform: none; font-size: 0.7rem; }
+
+    /* ── Masthead ── */
+    .masthead { text-align: center; padding: 16px 24px 8px; border-bottom: 3px double var(--rule); }
+    .masthead-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1;
+      color: var(--ink);
+    }
+    .masthead-tagline {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--ink-light);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Edition Bar ── */
+    .edition-bar {
+      border-bottom: 2px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      font-family: 'Libre Baskerville', serif;
+    }
+    .edition-bar span {
+      padding: 3px 16px;
+      border-right: 1px solid var(--rule);
+    }
+    .edition-bar span:last-child { border-right: none; }
+    .edition-bar .price { margin-left: auto; border-left: 1px solid var(--rule); border-right: none; }
+
+    /* ── Sleep Banner ── */
+    .sleep-banner {
+      background: var(--paper-dark);
+      border-bottom: 2px solid var(--rule);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .sleep-banner-label {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .sleep-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .sleep-stat-value { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.15rem; line-height: 1; }
+    .sleep-stat-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); }
+    .sleep-divider { width: 1px; height: 32px; background: var(--rule); opacity: 0.3; }
+    .sleep-score-bar { flex: 1; min-width: 120px; max-width: 220px; }
+    .sleep-score-bar-track { height: 6px; background: rgba(0,0,0,0.12); overflow: hidden; }
+    .sleep-score-bar-fill { height: 100%; background: var(--ink); }
+    .sleep-score-bar-label { display: flex; justify-content: space-between; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; color: var(--ink-light); }
+    .sleep-note { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.8rem; color: var(--ink-light); margin-left: auto; }
+
+    /* ── Section Rule ── */
+    .section-rule { display: flex; align-items: center; padding: 0 24px; }
+    .section-rule-label {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--paper);
+      padding: 4px 10px;
+      position: relative;
+      z-index: 1;
+      color: var(--accent);
+      border: 1px solid var(--rule);
+      border-top: none;
+    }
+    .section-rule-line { flex: 1; height: 1px; background: var(--rule); }
+
+    /* ── Kicker / Headline / Byline / Body shared ── */
+    .kicker { font-family: 'Libre Baskerville', serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 3px; }
+    .byline  { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 5px; }
+
+    /* ── Main Grid (emails + almanac) ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1px 340px;
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 2px solid var(--rule);
+    }
+    .col-divider { background: var(--rule); opacity: 0.25; margin: 16px 0; }
+
+    /* ── Feature Story ── */
+    .story-feature { padding: 16px var(--col-gap) 16px 0; }
+    .story-feature .headline { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(1.4rem, 2.5vw, 2rem); line-height: 1.1; margin-bottom: 8px; }
+    .story-feature .deck { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.95rem; line-height: 1.4; color: var(--ink-light); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 6px 0; margin-bottom: 10px; }
+    .story-feature .body { font-size: 0.87rem; line-height: 1.7; column-count: 2; column-gap: var(--col-gap); column-rule: 1px solid rgba(26,18,8,0.15); text-align: justify; hyphens: auto; }
+    .story-feature .body p + p { margin-top: 0.7em; }
+    .story-feature .body p:first-child::first-letter { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 3.4em; line-height: 0.78; float: left; margin-right: 4px; margin-top: 6px; color: var(--ink); }
+
+    /* email list (when no feature story) */
+    .email-list { display: flex; flex-direction: column; gap: 12px; padding: 16px var(--col-gap) 16px 0; }
+    .email-item { padding-bottom: 12px; border-bottom: 1px solid rgba(26,18,8,0.15); }
+    .email-item:last-child { border-bottom: none; }
+    .email-item .headline { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; line-height: 1.2; margin-bottom: 4px; }
+    .email-item .body { font-size: 0.82rem; line-height: 1.6; color: var(--ink); }
+
+    /* ── Almanac Sidebar ── */
+    .almanac { padding: 16px 0 16px var(--col-gap); display: flex; flex-direction: column; gap: 0; }
+
+    .almanac-weather {
+      background: var(--paper-dark);
+      border: 1px solid rgba(26,18,8,0.2);
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .almanac-weather-temp { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2.4rem; line-height: 1; }
+    .almanac-weather-desc { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.85rem; color: var(--ink-light); margin-top: 2px; }
+    .almanac-weather-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); flex-wrap: wrap; }
+    .almanac-weather-meta span::before { content: '↑ '; }
+    .almanac-weather-meta .sunset::before { content: '↓ '; }
+    .almanac-weather-meta .humidity::before { content: '~ '; }
+    .almanac-weather-meta .feels::before { content: ''; }
+
+    .almanac-block { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(26,18,8,0.18); }
+    .almanac-block:last-child { border-bottom: none; margin-bottom: 0; }
+    .almanac-block-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+
+    .word-of-day .word { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.2rem; }
+    .word-of-day .pos  { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.75rem; color: var(--ink-light); margin-bottom: 4px; }
+    .word-of-day .def  { font-size: 0.8rem; line-height: 1.5; }
+    .word-of-day .ex   { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.75rem; color: var(--ink-light); margin-top: 4px; }
+
+    .on-this-day-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .on-this-day-list li { font-size: 0.78rem; line-height: 1.45; }
+    .on-this-day-list .year { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--accent); margin-right: 4px; }
+
+    .trivia-list { display: flex; flex-direction: column; gap: 10px; }
+    .trivia-q { font-size: 0.78rem; line-height: 1.45; font-weight: 700; margin-bottom: 3px; }
+    .trivia-cat { font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 2px; }
+    .trivia-answer { font-size: 0.75rem; color: var(--ink-light); font-style: italic; cursor: pointer; }
+    .trivia-answer .reveal { display: none; }
+    .trivia-answer:hover .reveal { display: inline; }
+    .trivia-answer .hide { display: inline; }
+    .trivia-answer:hover .hide { display: none; }
+
+    /* ── Bottom 3-col (Markets / Classifieds / Garden) ── */
+    .mid-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 2px solid var(--rule);
+    }
+    .mid-col { padding: 14px 18px 14px 0; border-right: 1px solid rgba(26,18,8,0.2); }
+    .mid-col:last-child { border-right: none; padding-right: 0; padding-left: 18px; }
+    .mid-col:nth-child(2) { padding-left: 18px; }
+    .mid-col-headline { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; line-height: 1.2; margin-bottom: 8px; }
+
+    /* Markets */
+    .portfolio-total { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+    .portfolio-nav { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.6rem; line-height: 1; }
+    .portfolio-pnl { font-size: 0.78rem; }
+    .portfolio-pnl.pos { color: #1a5c1a; }
+    .portfolio-pnl.neg { color: var(--accent); }
+    .portfolio-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .portfolio-table th { text-align: left; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); border-bottom: 1px solid rgba(26,18,8,0.2); padding-bottom: 3px; }
+    .portfolio-table td { padding: 3px 0; border-bottom: 1px solid rgba(26,18,8,0.08); }
+    .portfolio-table td:last-child { text-align: right; }
+    .portfolio-table td.pos { color: #1a5c1a; }
+    .portfolio-table td.neg { color: var(--accent); }
+
+    /* Classifieds / Calendar */
+    .cal-event { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(26,18,8,0.12); }
+    .cal-event:last-child { border-bottom: none; }
+    .cal-time { font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .cal-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.88rem; line-height: 1.2; }
+    .cal-loc { font-size: 0.72rem; color: var(--ink-light); font-style: italic; }
+
+    /* Garden */
+    .plant-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(26,18,8,0.12); }
+    .plant-item:last-child { border-bottom: none; }
+    .plant-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.88rem; }
+    .plant-meta { font-size: 0.72rem; color: var(--ink-light); }
+
+    .not-configured { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.8rem; color: var(--ink-light); line-height: 1.5; }
+
+    /* ── Culture Strip (HN / Reddit / Spotify / APOD) ── */
+    .culture-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 2px solid var(--rule);
+    }
+    .culture-col { padding: 14px 16px 14px 0; border-right: 1px solid rgba(26,18,8,0.2); }
+    .culture-col:last-child { border-right: none; padding-right: 0; padding-left: 0; }
+    .culture-col:nth-child(2) { padding-left: 16px; }
+    .culture-col:nth-child(3) { padding-left: 16px; }
+    .culture-col:nth-child(4) { padding-left: 16px; }
+    .culture-headline { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.9rem; line-height: 1.2; margin-bottom: 8px; }
+
+    .hn-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .hn-list li { font-size: 0.78rem; line-height: 1.4; }
+    .hn-list li a { color: var(--ink); text-decoration: none; }
+    .hn-list li a:hover { text-decoration: underline; }
+    .hn-meta { font-size: 0.62rem; color: var(--ink-light); letter-spacing: 0.06em; }
+
+    .reddit-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .reddit-list li { font-size: 0.78rem; line-height: 1.4; }
+    .reddit-list li a { color: var(--ink); text-decoration: none; }
+    .reddit-list li a:hover { text-decoration: underline; }
+    .reddit-sub { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+
+    .spotify-top { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; line-height: 1.2; margin-bottom: 2px; }
+    .spotify-artist { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.82rem; color: var(--ink-light); margin-bottom: 8px; }
+    .spotify-tracks { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+    .spotify-tracks li { font-size: 0.75rem; color: var(--ink-light); }
+    .spotify-tracks li::before { content: "♪ "; color: var(--accent); }
+    .spotify-played { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); margin-top: 6px; }
+
+    .apod-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; margin-bottom: 6px; }
+    .apod-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.88rem; line-height: 1.2; margin-bottom: 4px; }
+    .apod-body { font-size: 0.75rem; line-height: 1.5; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .apod-card { cursor: pointer; }
+    .apod-card:hover .apod-title { text-decoration: underline; }
+    .apod-read-more { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-top: 4px; }
+
+    /* ── Sleep Modal ── */
+    .sleep-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,8,4,0.82);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .sleep-modal-overlay.open { display: flex; }
+    .sleep-modal-box {
+      background: var(--paper);
+      width: 100%;
+      max-width: 480px;
+      padding: 32px 36px 28px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.5);
+      border-top: 4px solid var(--rule);
+    }
+    .sleep-modal-ornament { text-align: center; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--ink-light); margin-bottom: 12px; }
+    .sleep-modal-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.5rem; line-height: 1.15; text-align: center; margin-bottom: 6px; }
+    .sleep-modal-deck { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.85rem; color: var(--ink-light); text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--rule); padding-bottom: 16px; }
+    .sleep-form { display: flex; flex-direction: column; gap: 14px; }
+    .sleep-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sleep-form-field { display: flex; flex-direction: column; gap: 4px; }
+    .sleep-form-field label { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-light); font-family: 'Libre Baskerville', serif; }
+    .sleep-form-field input[type="text"] {
+      border: none;
+      border-bottom: 1px solid var(--rule);
+      background: transparent;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--ink);
+      padding: 4px 0;
+      outline: none;
+      width: 100%;
+    }
+    .sleep-form-field input[type="text"]::placeholder { color: rgba(26,18,8,0.3); font-style: italic; }
+    .sleep-quality-row { display: flex; align-items: center; gap: 10px; }
+    .sleep-quality-score { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.4rem; min-width: 44px; text-align: right; }
+    input[type="range"] { flex: 1; accent-color: var(--ink); cursor: pointer; }
+    .sleep-form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; border-top: 1px solid var(--rule); padding-top: 14px; }
+    .sleep-btn-skip { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); background: none; border: none; cursor: pointer; font-family: 'Libre Baskerville', serif; }
+    .sleep-btn-skip:hover { color: var(--ink); }
+    .sleep-btn-save { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.08em; background: var(--ink); color: var(--paper); border: none; padding: 8px 20px; cursor: pointer; }
+    .sleep-btn-save:hover { background: var(--accent); }
+
+    /* ── Gallery Modal ── */
+    .gallery-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 8, 4, 0.88);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+    .gallery-overlay.open { display: flex; }
+    .gallery-modal {
+      background: var(--paper);
+      max-width: 780px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .gallery-modal-img-wrap { position: sticky; top: 0; height: 90vh; overflow: hidden; }
+    .gallery-modal-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-modal-body { padding: 32px 28px; overflow-y: auto; max-height: 90vh; }
+    .gallery-modal-kicker { font-family: 'Libre Baskerville', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .gallery-modal-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.4rem; line-height: 1.15; margin-bottom: 16px; border-bottom: 2px solid var(--rule); padding-bottom: 12px; }
+    .gallery-modal-text { font-size: 0.88rem; line-height: 1.75; text-align: justify; hyphens: auto; }
+    .gallery-modal-close { display: block; margin-top: 24px; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-light); cursor: pointer; }
+    .gallery-modal-close:hover { color: var(--accent); }
+
+    /* ── Op-Ed ── */
+    .oped-section { padding: 16px 24px; border-bottom: 2px solid var(--rule); }
+    .oped-headline { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1.15; margin-bottom: 10px; }
+    .oped-body { font-size: 0.87rem; line-height: 1.7; max-width: 680px; text-align: justify; hyphens: auto; }
+    .oped-byline { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 8px; }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 3px double var(--rule);
+      margin: 0 24px 0;
+      padding: 6px 0 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+    }
+
+    /* ── Pull Quote ── */
+    .pull-quote { border-top: 3px solid var(--rule); border-bottom: 3px solid var(--rule); padding: 10px 0; margin: 12px 0; }
+    .pull-quote p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.95rem; line-height: 1.35; text-align: center; }
+    .pull-quote cite { display: block; text-align: center; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-top: 5px; font-style: normal; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Dateline -->
+  <div class="dateline">
+    <span>Vol. {{ vol }} &nbsp;·&nbsp; No. {{ issue }}</span>
+    <span class="dateline-center">"All the news fit to print — for one reader only"</span>
+    <span>{{ date }}</span>
+  </div>
+
+  <!-- Masthead -->
+  <div class="masthead">
+    <div class="masthead-title">The Morning Dispatch</div>
+    <div class="masthead-tagline">Personal Edition &nbsp;·&nbsp; Curated nightly, delivered at dawn</div>
+  </div>
+
+  <!-- Edition Bar -->
+  <div class="edition-bar">
+    {% if weather %}
+      <span>{{ weather.city }}</span>
+      <span>Sunrise {{ weather.sunrise }}</span>
+      <span>{{ weather.description }} · {{ weather.temp }}°F</span>
+    {% else %}
+      <span>San Francisco, CA</span>
+      <span>Weather unavailable</span>
+      <span>&nbsp;</span>
+    {% endif %}
+    <span>Sleep Score: {{ sleep.quality }} / 100</span>
+    <span class="price">Free · Personal Use</span>
+  </div>
+
+  <!-- Sleep Banner -->
+  <div class="sleep-banner">
+    <div class="sleep-banner-label">Last Night's Rest</div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-stat">
+      <span class="sleep-stat-value" id="statBedtime">{{ sleep.bedtime }}</span>
+      <span class="sleep-stat-label">Bedtime</span>
+    </div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-stat">
+      <span class="sleep-stat-value" id="statWake">{{ sleep.wake_time }}</span>
+      <span class="sleep-stat-label">Wake time</span>
+    </div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-stat">
+      <span class="sleep-stat-value" id="statDuration">{{ sleep.duration }}</span>
+      <span class="sleep-stat-label">Duration</span>
+    </div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-score-bar">
+      <div class="sleep-score-bar-track">
+        <div class="sleep-score-bar-fill" id="sleepBarFill" style="width: {{ sleep.quality }}%;"></div>
+      </div>
+      <div class="sleep-score-bar-label">
+        <span>Sleep Quality</span>
+        <span id="statQualityText">{{ sleep.quality }} / 100</span>
+      </div>
+    </div>
+    <div class="sleep-note" id="statNote">{{ sleep.note if sleep.note }}</div>
+  </div>
+
+  <!-- ── Letters to the Editor + Almanac ────────────────── -->
+  <div class="section-rule" style="padding-top:0;">
+    <div class="section-rule-label">Letters to the Editor</div>
+    <div class="section-rule-line"></div>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- Email column -->
+    {% if emails %}
+      {% set top = emails[0] %}
+      <div class="story-feature">
+        <div class="kicker">Top Message</div>
+        <div class="headline">{{ top.subject }}</div>
+        <div class="deck">{{ top.snippet }}</div>
+        <div class="byline">From: {{ top.from }} &nbsp;·&nbsp; {{ top.date }}</div>
+        <div class="body">
+          {% for email in emails[1:5] %}
+            <p><strong>{{ email.subject }}</strong> — {{ email.snippet }}</p>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="email-list">
+        <div class="kicker">Inbox</div>
+        <p class="not-configured">Gmail not configured. Add <code>google_credentials.json</code> to connect your inbox.</p>
+      </div>
+    {% endif %}
+
+    <div class="col-divider"></div>
+
+    <!-- Almanac sidebar -->
+    <div class="almanac">
+
+      <!-- Weather block -->
+      {% if weather %}
+        <div class="almanac-block almanac-weather">
+          <div class="almanac-block-title">Today's Weather — {{ weather.city }}</div>
+          <div class="almanac-weather-temp">{{ weather.temp }}°</div>
+          <div class="almanac-weather-desc">{{ weather.description }}, feels like {{ weather.feels_like }}°F</div>
+          <div class="almanac-weather-meta">
+            <span>{{ weather.sunrise }}</span>
+            <span class="sunset">{{ weather.sunset }}</span>
+            <span class="humidity">{{ weather.humidity }}% humidity</span>
+          </div>
+        </div>
+      {% else %}
+        <div class="almanac-block">
+          <div class="almanac-block-title">Weather</div>
+          <p class="not-configured">Set OPENWEATHERMAP_KEY in .env</p>
+        </div>
+      {% endif %}
+
+      <!-- Word of the Day -->
+      {% if word_of_day %}
+        <div class="almanac-block word-of-day">
+          <div class="almanac-block-title">Word of the Day</div>
+          <div class="word">{{ word_of_day.word }}</div>
+          <div class="pos">{{ word_of_day.part_of_speech }}</div>
+          <div class="def">{{ word_of_day.definition }}</div>
+          {% if word_of_day.example %}
+            <div class="ex">"{{ word_of_day.example }}"</div>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="almanac-block">
+          <div class="almanac-block-title">Word of the Day</div>
+          <p class="not-configured">Set WORDNIK_API_KEY in .env</p>
+        </div>
+      {% endif %}
+
+      <!-- On This Day -->
+      {% if on_this_day %}
+        <div class="almanac-block">
+          <div class="almanac-block-title">On This Day in History</div>
+          <ul class="on-this-day-list">
+            {% for event in on_this_day %}
+              <li><span class="year">{{ event.year }}</span>{{ event.text }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- Trivia -->
+      {% if trivia %}
+        <div class="almanac-block">
+          <div class="almanac-block-title">Daily Trivia</div>
+          <div class="trivia-list">
+            {% for q in trivia %}
+              <div>
+                <div class="trivia-cat">{{ q.category }} · {{ q.difficulty }}</div>
+                <div class="trivia-q">{{ q.question }}</div>
+                <div class="trivia-answer">
+                  <span class="hide">[reveal answer]</span>
+                  <span class="reveal">{{ q.correct_answer }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+    </div><!-- /almanac -->
+  </div><!-- /main-grid -->
+
+  <!-- ── Markets · Classifieds · Garden ─────────────────── -->
+  <div class="section-rule">
+    <div class="section-rule-label">Markets · Classifieds · Garden</div>
+    <div class="section-rule-line"></div>
+  </div>
+
+  <div class="mid-grid">
+
+    <!-- Markets -->
+    <div class="mid-col">
+      <div class="kicker">Financial Desk</div>
+      <div class="mid-col-headline">Markets</div>
+      {% if portfolio %}
+        <table class="portfolio-table">
+          <tr><th>Ticker</th><th>Price</th><th>Change</th></tr>
+          {% for pos in portfolio %}
+            <tr>
+              <td><strong>{{ pos.ticker }}</strong></td>
+              <td>${{ pos.price }}</td>
+              <td class="{% if pos.change >= 0 %}pos{% else %}neg{% endif %}">
+                {% if pos.change >= 0 %}+{% endif %}{{ pos.change }} ({% if pos.change_pct >= 0 %}+{% endif %}{{ pos.change_pct }}%)
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <p class="not-configured">Could not fetch market data.</p>
+      {% endif %}
+    </div>
+
+    <!-- Classifieds / Calendar -->
+    <div class="mid-col">
+      <div class="kicker">Classifieds</div>
+      {% if calendar is none %}
+        <div class="mid-col-headline">Schedule</div>
+        <p class="not-configured">Add <code>google_credentials.json</code> to connect Google Calendar.</p>
+      {% elif calendar %}
+        <div class="mid-col-headline">Today's Schedule</div>
+        {% for event in calendar %}
+          <div class="cal-event">
+            <div class="cal-time">{{ event.start }}</div>
+            <div class="cal-title">{{ event.title }}</div>
+            {% if event.location %}
+              <div class="cal-loc">{{ event.location }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="mid-col-headline">Today's Schedule</div>
+        <p class="not-configured" style="font-style:normal;">Nothing scheduled for today.</p>
+      {% endif %}
+    </div>
+
+    <!-- Garden Report -->
+    <div class="mid-col">
+      <div class="kicker">Nature Desk</div>
+      {% if plants %}
+        <div class="mid-col-headline">Garden Report</div>
+        {% for plant in plants %}
+          <div class="plant-item">
+            <div class="plant-name">{{ plant.name }}</div>
+            <div class="plant-meta">Last watered: {{ plant.last_watered }} · Next: {{ plant.next_watering }}</div>
+            {% if plant.note %}<div class="plant-meta">{{ plant.note }}</div>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="mid-col-headline">Garden Report</div>
+        <p class="not-configured">Plant app coming soon. We'll build it — FastAPI + SQLite.</p>
+      {% endif %}
+    </div>
+
+  </div><!-- /mid-grid -->
+
+  <!-- ── Culture & Discovery ────────────────────────────── -->
+  <div class="section-rule">
+    <div class="section-rule-label">Culture &amp; Discovery</div>
+    <div class="section-rule-line"></div>
+  </div>
+
+  <div class="culture-grid">
+
+    <!-- Hacker News -->
+    <div class="culture-col">
+      <div class="kicker">Technology</div>
+      <div class="culture-headline">Hacker News</div>
+      {% if hackernews %}
+        <ol class="hn-list">
+          {% for story in hackernews %}
+            <li>
+              <a href="{{ story.url }}" target="_blank">{{ story.title }}</a>
+              <div class="hn-meta">{{ story.score }} pts · {{ story.comments }} comments · by {{ story.by }}</div>
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p class="not-configured">Could not fetch Hacker News stories.</p>
+      {% endif %}
+    </div>
+
+    <!-- Reddit -->
+    <div class="culture-col">
+      <div class="kicker">Community</div>
+      <div class="culture-headline">Reddit Top Posts</div>
+      {% if reddit %}
+        <ul class="reddit-list">
+          {% for post in reddit %}
+            <li>
+              <div class="reddit-sub">r/{{ post.subreddit }}</div>
+              <a href="{{ post.url }}" target="_blank">{{ post.title }}</a>
+              <div class="hn-meta">{{ post.score }} pts · {{ post.comments }} comments</div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="not-configured">Add REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET to .env</p>
+      {% endif %}
+    </div>
+
+    <!-- Spotify -->
+    <div class="culture-col">
+      <div class="kicker">Music</div>
+      <div class="culture-headline">Spotify Recap</div>
+      {% if spotify %}
+        <div class="spotify-top">{{ spotify.top_track }}</div>
+        <div class="spotify-artist">by {{ spotify.top_artist }}</div>
+        <ul class="spotify-tracks">
+          {% for track in spotify.recent_tracks %}
+            <li>{{ track }}</li>
+          {% endfor %}
+        </ul>
+        <div class="spotify-played">{{ spotify.total_played }} tracks played recently</div>
+      {% else %}
+        <p class="not-configured">Add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to .env</p>
+      {% endif %}
+    </div>
+
+    <!-- NASA APOD -->
+    <div class="culture-col">
+      <div class="kicker">Science</div>
+      <div class="culture-headline">NASA: Astronomy Picture</div>
+      {% if apod %}
+        <div class="apod-card" onclick="openGallery()" style="cursor:pointer">
+          {% if apod.media_type == "image" %}
+            <img class="apod-img" src="{{ apod.url }}" alt="{{ apod.title }}" />
+          {% endif %}
+          <div class="apod-title">{{ apod.title }}</div>
+          <div class="apod-body">{{ apod.explanation }}</div>
+          <div class="apod-read-more">Read full caption →</div>
+        </div>
+      {% else %}
+        <p class="not-configured">Set NASA_API_KEY in .env</p>
+      {% endif %}
+    </div>
+
+  </div><!-- /culture-grid -->
+
+  <!-- ── Op-Ed ──────────────────────────────────────────── -->
+  {% if oped %}
+    <div class="section-rule">
+      <div class="section-rule-label">The Op-Ed</div>
+      <div class="section-rule-line"></div>
+    </div>
+    <div class="oped-section">
+      <div class="oped-byline">By Claude Sonnet &nbsp;·&nbsp; AI Correspondent</div>
+      {% set oped_lines = oped.split('\n') %}
+      <div class="oped-headline">{{ oped_lines[0] }}</div>
+      <div class="oped-body">
+        {% for line in oped_lines[1:] %}
+          {% if line.strip() %}<p>{{ line }}</p>{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>The Morning Dispatch &nbsp;·&nbsp; Personal Edition</span>
+    <span>Generated {{ date_short }} at {{ generated_at }}</span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Sleep Modal -->
+<div class="sleep-modal-overlay{% if sleep.quality == 0 %} open{% endif %}" id="sleepOverlay">
+  <div class="sleep-modal-box">
+    <div class="sleep-modal-ornament">✦ &nbsp; Morning Edition &nbsp; ✦</div>
+    <div class="sleep-modal-title">How Did You Sleep?</div>
+    <div class="sleep-modal-deck">Record last night's rest to complete your morning edition.</div>
+    <form class="sleep-form" id="sleepForm">
+      <div class="sleep-form-row">
+        <div class="sleep-form-field">
+          <label>Bedtime</label>
+          <input type="text" name="bedtime" id="inputBedtime" placeholder="11:30 PM" autocomplete="off" oninput="calcDuration()" />
+        </div>
+        <div class="sleep-form-field">
+          <label>Wake Time</label>
+          <input type="text" name="wake_time" id="inputWake" placeholder="7:15 AM" autocomplete="off" oninput="calcDuration()" />
+        </div>
+      </div>
+      <div class="sleep-form-field" id="durationRow" style="display:none">
+        <label>Duration</label>
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;padding:4px 0;border-bottom:1px solid var(--rule)" id="durationDisplay"></div>
+      </div>
+      <div class="sleep-form-field">
+        <label>Sleep Quality — <span id="qualityDisplay">75</span> / 100</label>
+        <div class="sleep-quality-row">
+          <input type="range" name="quality" min="0" max="100" value="75"
+                 oninput="document.getElementById('qualityDisplay').textContent = this.value" />
+          <span class="sleep-quality-score" id="qualityScore">75</span>
+        </div>
+      </div>
+      <div class="sleep-form-field">
+        <label>Note <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input type="text" name="note" placeholder="Vivid dreams, woke up early…" autocomplete="off" />
+      </div>
+      <div class="sleep-form-actions">
+        <button type="button" class="sleep-btn-skip" onclick="document.getElementById('sleepOverlay').classList.remove('open')">Skip for now</button>
+        <button type="submit" class="sleep-btn-save">Save &amp; Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function parseTime(s) {
+    s = s.trim().toUpperCase().replace(/\./g, '');
+    const m = s.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/);
+    if (!m) return null;
+    let h = parseInt(m[1]), min = parseInt(m[2] || '0');
+    if (m[3] === 'PM' && h !== 12) h += 12;
+    if (m[3] === 'AM' && h === 12) h = 0;
+    return h * 60 + min;
+  }
+
+  function calcDuration() {
+    const bt = parseTime(document.getElementById('inputBedtime').value);
+    const wt = parseTime(document.getElementById('inputWake').value);
+    if (bt === null || wt === null) {
+      document.getElementById('durationRow').style.display = 'none';
+      return;
+    }
+    let diff = wt - bt;
+    if (diff <= 0) diff += 24 * 60; // crossed midnight
+    const h = Math.floor(diff / 60), m = diff % 60;
+    document.getElementById('durationDisplay').textContent = h + 'h ' + m + 'm';
+    document.getElementById('durationRow').style.display = '';
+  }
+
+  // sync slider → score display
+  document.querySelector('input[name="quality"]').addEventListener('input', function() {
+    document.getElementById('qualityScore').textContent = this.value;
+  });
+
+  document.getElementById('sleepForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this));
+    const btn  = this.querySelector('.sleep-btn-save');
+    btn.textContent = 'Saving…';
+    btn.disabled = true;
+
+    try {
+      await fetch('http://localhost:5050/sleep', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      location.reload();
+    } catch(err) {
+      // server unreachable — update DOM in place
+      document.getElementById('statBedtime').textContent    = data.bedtime    || '–';
+      document.getElementById('statWake').textContent       = data.wake_time  || '–';
+      document.getElementById('statDuration').textContent   = '…';
+      document.getElementById('sleepBarFill').style.width   = data.quality + '%';
+      document.getElementById('statQualityText').textContent = data.quality + ' / 100';
+      document.getElementById('statNote').textContent        = data.note || '';
+      document.getElementById('sleepOverlay').classList.remove('open');
+    }
+  });
+</script>
+
+{% if apod and apod.media_type == "image" %}
+<!-- Gallery Modal -->
+<div class="gallery-overlay" id="galleryOverlay" onclick="closeGallery(event)">
+  <div class="gallery-modal" id="galleryModal">
+    <div class="gallery-modal-img-wrap">
+      <img src="{{ apod.url }}" alt="{{ apod.title }}" />
+    </div>
+    <div class="gallery-modal-body">
+      <div class="gallery-modal-kicker">NASA · Astronomy Picture of the Day · {{ apod.date }}</div>
+      <div class="gallery-modal-title">{{ apod.title }}</div>
+      <div class="gallery-modal-text">{{ apod.explanation }}</div>
+      <span class="gallery-modal-close" onclick="closeGallery()">✕ Close</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openGallery() {
+    document.getElementById('galleryOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeGallery(e) {
+    if (e && document.getElementById('galleryModal').contains(e.target)) return;
+    document.getElementById('galleryOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeGallery();
+  });
+</script>
+{% endif %}
+
+</body>
+</html>
