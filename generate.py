@@ -354,6 +354,28 @@ def start_sleep_server():
 
 # ── main ───────────────────────────────────────────────────────────
 
+def _upload_dispatch(html: str):
+    url    = os.getenv("DISPATCH_URL", "").strip()
+    secret = os.getenv("DISPATCH_SECRET", "").strip()
+    if not url or not secret:
+        return
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            url,
+            data=html.encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {secret}",
+                "Content-Type": "text/html; charset=utf-8",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            print(f"  ✓ Uploaded to {url.replace('/dispatch/upload', '/dispatch')}")
+    except Exception as e:
+        print(f"  ✗ Upload failed: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-open",  action="store_true")
@@ -372,6 +394,8 @@ def main():
     html  = render(ctx)
     REPORT.write_text(html, encoding="utf-8")
     print(f"\nWrote {REPORT}")
+
+    _upload_dispatch(html)
 
     if not args.no_email:
         try:
