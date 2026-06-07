@@ -41,7 +41,8 @@ def build(ctx: dict, dispatch_url: str = "") -> str:
     catfact    = ctx.get("catfact")
     rm         = ctx.get("rickandmorty")
     iss        = ctx.get("iss")
-    spaceflight = ctx.get("spaceflight") or []
+    spaceflight  = ctx.get("spaceflight") or []
+    nyc_startups = ctx.get("nyc_startups") or []
     apod       = ctx.get("apod")
     on_this_day = ctx.get("on_this_day") or []
     oped       = ctx.get("oped")
@@ -169,6 +170,17 @@ def build(ctx: dict, dispatch_url: str = "") -> str:
         {spotify.get("total_played",0)} tracks played recently
       </div>"""
         parts.append(_section("Spotify Recap", body))
+
+    # ── nyc startups ─────────────────────────────────────────────────
+    if nyc_startups:
+        body = ""
+        for a in nyc_startups:
+            body += f"""<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid {BORDER};">
+          <div style="font-size:10px;color:{ACCENT};letter-spacing:0.08em;text-transform:uppercase;">{a["source"]}</div>
+          <a href="{a["url"]}" style="font-size:13px;color:{INK};font-weight:bold;text-decoration:none;">{a["title"]}</a>
+          {"<div style='font-size:11px;color:"+LIGHT+";font-style:italic;margin-top:2px;'>"+a["summary"]+"</div>" if a.get("summary") else ""}
+        </div>"""
+        parts.append(_section("NYC Startups", body))
 
     # ── spaceflight news ──────────────────────────────────────────────
     if spaceflight:

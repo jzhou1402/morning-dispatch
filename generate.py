@@ -195,6 +195,7 @@ def build_context(sleep: dict) -> dict:
     from fetchers.rickandmorty     import fetch as rm_fetch
     from fetchers.iss              import fetch as iss_fetch
     from fetchers.spaceflight      import fetch as sf_fetch
+    from fetchers.nyc_startups     import fetch as nyc_fetch
     from fetchers.plants           import fetch as plants_fetch
 
     hackernews  = _safe_fetch("Hacker News",  hn_fetch,     count=5)
@@ -213,6 +214,7 @@ def build_context(sleep: dict) -> dict:
     rickandmorty = _safe_fetch("Rick & Morty", rm_fetch)
     iss          = _safe_fetch("ISS",          iss_fetch)
     spaceflight  = _safe_fetch("Spaceflight",  sf_fetch)
+    nyc_startups = _safe_fetch("NYC Startups", nyc_fetch)
     plants       = _safe_fetch("Plants",       plants_fetch)
 
     today     = date.today()
@@ -244,6 +246,7 @@ def build_context(sleep: dict) -> dict:
         "portfolio":    portfolio,
         "oped":         oped,
         "plants":       plants,
+        "nyc_startups": nyc_startups,
         "catfact":      catfact,
         "rickandmorty": rickandmorty,
         "iss":          iss,

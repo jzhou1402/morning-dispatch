@@ -681,9 +681,9 @@
     </div><!-- /almanac -->
   </div><!-- /main-grid -->
 
-  <!-- ── Markets · Classifieds · Garden ─────────────────── -->
+  <!-- ── Markets · Classifieds · NYC Startups ──────────── -->
   <div class="section-rule">
-    <div class="section-rule-label">Markets · Classifieds · Garden</div>
+    <div class="section-rule-label">Markets · Classifieds · NYC Startups</div>
     <div class="section-rule-line"></div>
   </div>
 
@@ -734,21 +734,25 @@
       {% endif %}
     </div>
 
-    <!-- Garden Report -->
+    <!-- NYC Startups -->
     <div class="mid-col">
-      <div class="kicker">Nature Desk</div>
-      {% if plants %}
-        <div class="mid-col-headline">Garden Report</div>
-        {% for plant in plants %}
-          <div class="plant-item">
-            <div class="plant-name">{{ plant.name }}</div>
-            <div class="plant-meta">Last watered: {{ plant.last_watered }} · Next: {{ plant.next_watering }}</div>
-            {% if plant.note %}<div class="plant-meta">{{ plant.note }}</div>{% endif %}
+      <div class="kicker">NYC Tech Desk</div>
+      <div class="mid-col-headline">NYC Startups</div>
+      {% if nyc_startups %}
+        {% for article in nyc_startups %}
+          <div class="cal-event">
+            <div class="cal-time">{{ article.source }}</div>
+            <div class="cal-title">
+              <a href="{{ article.url }}" target="_blank"
+                 style="color:var(--ink);text-decoration:none;">{{ article.title }}</a>
+            </div>
+            {% if article.summary %}
+              <div class="cal-loc">{{ article.summary }}</div>
+            {% endif %}
           </div>
         {% endfor %}
       {% else %}
-        <div class="mid-col-headline">Garden Report</div>
-        <p class="not-configured">Plant app coming soon. We'll build it — FastAPI + SQLite.</p>
+        <p class="not-configured">Could not fetch NYC startup news.</p>
       {% endif %}
     </div>
 
