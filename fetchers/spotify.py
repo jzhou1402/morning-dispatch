@@ -22,15 +22,33 @@ def fetch():
     recent = sp.current_user_recently_played(limit=20)
     items  = recent.get("items", [])
 
-    tracks  = [i["track"]["name"]             for i in items]
-    artists = [i["track"]["artists"][0]["name"] for i in items]
+    # pair each play as (track_name, artist_name)
+    plays = [
+        (i["track"]["name"], i["track"]["artists"][0]["name"])
+        for i in items
+    ]
 
-    top_track_name = Counter(tracks).most_common(1)[0][0] if tracks else ""
-    top_idx        = tracks.index(top_track_name)         if tracks else 0
+    if not plays:
+        return None
+
+    # most played track (with its correct artist)
+    track_counts = Counter(name for name, _ in plays)
+    top_track_name = track_counts.most_common(1)[0][0]
+    top_artist = next(artist for name, artist in plays if name == top_track_name)
+
+    # 5 most recently played unique tracks
+    seen = set()
+    recent_tracks = []
+    for name, _ in plays:
+        if name not in seen:
+            seen.add(name)
+            recent_tracks.append(name)
+        if len(recent_tracks) == 5:
+            break
 
     return {
         "top_track":     top_track_name,
-        "top_artist":    artists[top_idx] if artists else "",
-        "recent_tracks": list(dict.fromkeys(tracks))[:5],
+        "top_artist":    top_artist,
+        "recent_tracks": recent_tracks,
         "total_played":  len(items),
     }

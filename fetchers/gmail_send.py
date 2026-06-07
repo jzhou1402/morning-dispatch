@@ -36,23 +36,25 @@ def _default_recipient(service):
     return profile.get("emailAddress")
 
 
-def send_dispatch(report_path: Path, subject: str, to_email: str = None):
+def send_dispatch(ctx: dict, subject: str, to_email: str = None):
     if not os.path.exists(CREDS_FILE):
-        print("  - Email delivery skipped (google_credentials.json missing)")
+        print("  – Email delivery skipped (google_credentials.json missing)")
         return None
 
-    service = _get_service()
-    recipient = to_email or os.getenv("DISPATCH_EMAIL_TO") or _default_recipient(service)
+    from fetchers.email_digest import build as build_digest
+
+    service      = _get_service()
+    recipient    = to_email or os.getenv("DISPATCH_EMAIL_TO") or _default_recipient(service)
     if not recipient:
-        print("  - Email delivery skipped (no recipient)")
+        print("  – Email delivery skipped (no recipient)")
         return None
 
-    html = Path(report_path).read_text(encoding="utf-8")
+    html = build_digest(ctx)
 
     message = EmailMessage()
-    message["To"] = recipient
+    message["To"]      = recipient
     message["Subject"] = subject
-    message.set_content("Your dispatch is attached below as an HTML email.")
+    message.set_content("Open in an HTML-capable email client to view your Morning Dispatch.")
     message.add_alternative(html, subtype="html")
 
     raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")

@@ -6,6 +6,7 @@ token_gmail_send.json
 token_calendar.json
 .spotify_token_cache
 report.html
+archive/
 fetch_cache.json
 sleep_cache.json
 sleep_history.json

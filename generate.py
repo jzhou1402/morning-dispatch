@@ -275,7 +275,7 @@ def deliver_email(ctx: dict, to_email: str = None):
     from fetchers.gmail_send import send_dispatch
 
     subject = f"{ctx['dispatch_title']} - {ctx['date_short']}"
-    return send_dispatch(REPORT, subject, to_email=to_email)
+    return send_dispatch(ctx, subject, to_email=to_email)
 
 # ── sleep form server ──────────────────────────────────────────────
 
@@ -393,7 +393,12 @@ def main():
     ctx   = add_dispatch_metadata(ctx)
     html  = render(ctx)
     REPORT.write_text(html, encoding="utf-8")
+    archive_dir = ROOT / "archive"
+    archive_dir.mkdir(exist_ok=True)
+    archive_file = archive_dir / f"{date.today().isoformat()}.html"
+    archive_file.write_text(html, encoding="utf-8")
     print(f"\nWrote {REPORT}")
+    print(f"Archived → {archive_file.name}")
 
     _upload_dispatch(html)
 
